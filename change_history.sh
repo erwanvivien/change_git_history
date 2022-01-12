@@ -11,6 +11,9 @@ git log --pretty=format:"%cI | %H | %s" | head -n "$LAST_X_COMMITS" > "$save_fil
 echo "" >> "$save_file" # adds last newline"
 cp "$save_file" "$edit_file"
 
+NB_COMMITS=$(git rev-list --count HEAD)
+[[ "$NB_COMMITS" -lt "$LAST_X_COMMITS" ]] && REV="--all" || REV="HEAD~$LAST_X_COMMITS..HEAD";
+
 EDITOR=$(git var GIT_EDITOR)
 
 # Let user edit file
@@ -69,4 +72,4 @@ fi
 git filter-branch -f \
     --env-filter "$UPDATES" \
     --msg-filter "$MESSAGES" \
-    HEAD~${LAST_X_COMMITS}..HEAD
+    -- "$REV"
