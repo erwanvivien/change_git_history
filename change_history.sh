@@ -64,6 +64,11 @@ else
 fi;
 "
 
+if [[ -z "$UPDATES" ]]; then
+    echo "No update needs to be made"
+    exit
+fi
+
 git filter-branch -f \
     --env-filter "$UPDATES" \
     --msg-filter "$MESSAGES" \
