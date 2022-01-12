@@ -5,7 +5,9 @@ save_file=$(mktemp change_date_XXXXXX --tmpdir=/tmp)
 trap "rm -f $edit_file" EXIT
 trap "rm -f $save_file" EXIT
 
-git log --pretty=format:"%cI | %H | %s" > "$save_file"
+LAST_X_COMMITS="${1:-5}"
+
+git log --pretty=format:"%cI | %H | %s" | head -n "$LAST_X_COMMITS" > "$save_file"
 echo "" >> "$save_file" # adds last newline"
 cp "$save_file" "$edit_file"
 
@@ -30,17 +32,12 @@ then
 "
 while IFS= read -r line; do
     [[ -z "$line" ]] && continue;
-    [[ "$line" =~ $commit_regex ]] || continue
+    [[ "$line" =~ $commit_regex ]] || continue;
 
     pattern=' | '
     splitted="$(sed "s/$pattern/\n/g" <<< "$line")"
 
     read -d "\n" com_date com_hash com_msg <<< "$splitted"
-
-    echo "date: $com_date"
-    echo "hash: $com_hash"
-    echo "msg : $com_msg"
-    echo
 
     UPDATES="$UPDATES""
 if [ \"\$GIT_COMMIT\" = \"$com_hash\" ];
@@ -72,4 +69,4 @@ fi
 git filter-branch -f \
     --env-filter "$UPDATES" \
     --msg-filter "$MESSAGES" \
-    -- --all
+    HEAD~${LAST_X_COMMITS}..HEAD
