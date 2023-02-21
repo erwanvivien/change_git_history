@@ -55,7 +55,7 @@ fi;
     MESSAGES="$MESSAGES""
 elif [ \"\$GIT_COMMIT\" = '$com_hash' ];
 then
-    sed 's/.*/$com_msg_esc/g'"
+    echo '${com_msg_esc}'"
 done <<< "$edited_lines"
 
 MESSAGES="$MESSAGES""
